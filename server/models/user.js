@@ -81,14 +81,15 @@ async function getUser(user) {
   return await con.query(sql);  
 }
 
-
+/*
 let cathy = {
   userID: 5,
   userName: "cathy123",
   password: "icecream"
 }; 
-login(cathy);
 
+login(cathy);
+*/
 
 module.exports = { getAllUsers, login, register, editUser, deleteUser};
 
