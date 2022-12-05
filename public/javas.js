@@ -64,6 +64,7 @@ if (Login) Login.addEventListener("submit",Loggin);
    document.getElementById("email").value="";
    document.getElementById("password").value="";
    }
+   
 
 //Notes javascript part
 class Note{
