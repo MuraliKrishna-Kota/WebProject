@@ -3,10 +3,11 @@ const con = require("./db_connect");
 // Table Creation 
 async function createTable() {
   let sql=`CREATE TABLE IF NOT EXISTS notes (
-    userID INT NOT NULL AUTO_INCREMENT,
-    noteID INT NOT NULL,
-    noteContent VARCHAR(250),
-    CONSTRAINT userPK PRIMARY KEY(userID)
+    userID INT NOT NULL,
+    noteID INT NOT NULL AUTO_INCREMENT,
+    noteContent VARCHAR(2500),
+    CONSTRAINT notePK PRIMARY KEY(noteID),
+    CONSTRAINT note_FK FOREIGN KEY(noteID) references users(userID)
   ); `
   await con.query(sql);
 }
@@ -34,7 +35,7 @@ async function Read(note) { // {userName: "sda", password: "gsdhjsga"}
 async function editNotes(note) {
   let sql = `UPDATE notes 
     SET noteContent = "${note.noteContent}"
-    WHERE userID = ${note.userID}
+    WHERE noteID = ${note.noteID}
   `;
 
   await con.query(sql);
@@ -45,7 +46,7 @@ async function editNotes(note) {
 // Delete Note function
 async function deleteNote(note) {
   let sql = `DELETE FROM notes
-    WHERE userID = ${note.userID}
+    WHERE noteID = ${note.noteID}
   `
   await con.query(sql);
 }
@@ -57,7 +58,7 @@ async function getNote(note) {
   if(note.userID) {
     sql = `
       SELECT * FROM notes
-       WHERE userID = ${note.userID}
+       WHERE noteID = ${note.noteID}
     `
   } else {
     sql = `
@@ -68,14 +69,14 @@ async function getNote(note) {
   return await con.query(sql);  
 }
 
-
+/*
 let cathy = {
   userID: 5,
   noteID: 6,
   noteContent: "icecream"
 }; 
 Read(cathy);
-
+*/
 
 module.exports = { getAllNotes, Read, editNotes, deleteNote};
 /*const notes = [

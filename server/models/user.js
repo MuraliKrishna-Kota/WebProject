@@ -5,8 +5,8 @@ async function createTable() {
   let sql=`CREATE TABLE IF NOT EXISTS users (
     userID INT NOT NULL AUTO_INCREMENT,
     userName VARCHAR(255) NOT NULL UNIQUE,
-    userWeight NUMERIC,
-    userHeight NUMERIC,
+    userfname VARCHAR(255),
+    userlname VARCHAR(255),
     password VARCHAR(255) NOT NULL,
     CONSTRAINT userPK PRIMARY KEY(userID)
   ); `
@@ -37,8 +37,8 @@ async function register(user) {
 async function login(user) { // {userName: "sda", password: "gsdhjsga"}
   let cUser = await getUser(user); //[{userName: "cathy123", password: "icecream"}]
   
-  //if(!cUser[0]) throw Error("Username not found");
-  //if(cUser[0].password !== user.password) throw Error("Password incorrect");
+  if(!cUser[0]) throw Error("Username not found");
+  if(cUser[0].password !== user.password) throw Error("Password incorrect");
 
   return cUser[0];
 }
