@@ -1,4 +1,78 @@
 async function fetchData(route = '', data = {}, methodType) {
+  const response = await fetch(`http://localhost:3000${route}`, {
+    method: methodType, // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(data) // body data type must match "Content-Type" header
+  });
+  if(response.ok) {
+    return await response.json(); // parses JSON response into native JavaScript objects
+  } else {
+    throw await response.json();
+  }
+} 
+
+// logout event listener
+let logout = document.getElementById("logout-btn");
+if(logout) logout.addEventListener('click', removeCurrentUser)
+
+// stateful mechanism for user
+// logging in a user
+function setCurrentUser(user) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
+
+// getting current user function
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('user'));
+}
+
+// logout function for current user
+function removeCurrentUser() {
+  localStorage.removeItem('user');
+  window.location.href = "login.html";
+}
+
+function setCurrentNote(note) {
+  localStorage.setItem('note', JSON.stringify(note));
+}
+
+// getting current note function
+function getCurrentNote() {
+  return JSON.parse(localStorage.getItem('note'));
+}
+
+
+
+/*const { getNotes } = require("../server/models/note");
+
+const { con } = require("../server/models/db_connect");
+let nav = document.querySelector('nav');
+
+if(getCurrentUser()) {
+  nav.innerHTML = `
+    <ul>
+      
+      <li><a href="profile.html">Profile</a></li>
+      <li><a id="logout-btn">Logout</a></li>
+    </ul>
+  `
+} else {
+  nav.innerHTML = `
+    <ul>
+      
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Sign Up</a></li>
+    </ul>
+  `
+}
+async function fetchData(route = '', data = {}, methodType) {
     const response = await fetch(`http://localhost:3000${route}`, {
       method: methodType, // *GET, POST, PUT, DELETE, etc.
       mode: 'cors', // no-cors, *cors, same-origin
@@ -20,12 +94,19 @@ async function fetchData(route = '', data = {}, methodType) {
   
   // user class
   class User {
-    constructor(userName, password, fullName) {
+    constructor(userName, password, firstname, lastname,noteContent) {
       this.userName = userName;
       this.password = password;
-      this.fullName = fullName;
+      this.firstname = firstname;
+      this.lastname = lastname;
+      this.noteContent=noteContent;
+      
     }
-  
+    getNotes(){
+      return this.noteContent;
+    }
+   
+   
     getUsername() {
       return this.userName;
     }
@@ -38,9 +119,10 @@ async function fetchData(route = '', data = {}, methodType) {
   function login(e) {
     e.preventDefault();
   
-    let userName = document.getElementById("username").value;
+    let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
-    let user = new User(userName, password);
+    let user = new User(username, password);
+    console.log(user)
   
     fetchData("/users/login", user, "POST")
     .then((data) => {
@@ -67,13 +149,78 @@ async function fetchData(route = '', data = {}, methodType) {
     fetchData("/users/register", user, "POST")
     .then((data) => {
       setCurrentUser(data);
-      window.location.href = "login.html";
+      window.location.href = "note.html";
     })
     .catch((err) =>{
       console.log(err);
     })
   }
+
+
+let enternote = document.getElementById("Notes");
+if(enternote) enternote.addEventListener('submit',notePageFunction)
+
+function notePageFunction(e){
+    e.preventDefault();
+    let notes = document.getElementById('note').value;
+    let note = new Note(notes);
+    let user=getCurrentUser;
+    note.userID=user.userID
+    
+    alert("note created")
+    console.log(note);
+    //if (notes.userID = User.userID);
+    
+    fetchData("/notes/create", note, "POST")
+    .then((data) => {
+      //setCurrentUser(data);
+      setCurrentNote(data);
+      window.location.href = "note.html";
+    })
+    .catch((err) =>{
+      let p = document.querySelector('.error');
+      p.innerHTML=err.message;
+      //console.log(err);
+    })
+    const Note1 = new Note(notes);
+    console.log(Note1);
+    window.location.href="note.html";
+    document.getElementById("Notes").reset();
+}
+
+
+  class Note {
+    constructor(noteContent) {
+      this.noteContent=noteContent;
+      
+    }
+    getNote(){
+      return this.noteContent;
+    }
+  }  
+  let user=getCurrentUser();
+  if(user && enternote) getNotes();
+
+  function getNotes(){
+    let user = getCurrentUser();
+    fetchData("/notes/", user,"post")
+    .then((data)=>{
+      let ul = document.getElementById("enternote");
+      data.forEach((note)=>{
+        let li = document.createElement('li');
+        let text=document.createTextNode(note.note);
+        li.appendChild(text);
+        ul.appendChild(li);
+      })
+    })
+    .catch((err)=>console.log('err'));
+  }
   
+
+
+  
+  
+
   // logout event listener
   let logout = document.getElementById("logout-btn");
   if(logout) logout.addEventListener('click', removeCurrentUser)
@@ -81,7 +228,7 @@ async function fetchData(route = '', data = {}, methodType) {
   // stateful mechanism for user
   // logging in a user
   function setCurrentUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem('user', JSON.stringify(user));
   }
   
   // getting current user function
@@ -96,7 +243,7 @@ async function fetchData(route = '', data = {}, methodType) {
   }
   
 
-/*class User{
+class User{
     constructor(Firstname,Lastname,Username,Password){
           this.Firstname = Firstname;
           this.Lastname = Lastname;
